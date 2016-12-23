@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Markus Rainer
+  description: OMD Installing and Configuration
+  company: NTS AG
+  license: MIT
+  min_ansible_version: 1.9
+  platforms:
+  - name: Ubuntu
+    versions:
+    - 16.04
+    - 15.04
+  galaxy_tags:
+    - omd
+    - installer
+    - monitoring
+    - configuration

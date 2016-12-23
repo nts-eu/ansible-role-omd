@@ -1,0 +1,41 @@
+---
+# OMD preconfig.yaml
+
+- name: stop MySQL service
+  service: 
+    name: mysql 
+    state: stopped
+    enabled: no
+  become: true
+
+- name: check site {{ omd_site }} created
+  shell: >
+    /opt/omd/versions/default/bin/omd sites | grep {{ omd_site }}
+  register: omd_site_output
+  changed_when: false
+  failed_when: false
+
+- name: create site {{ omd_site }}
+  shell: >
+    omd create -u {{ omd_user_id }} -g {{ omd_group_id }} {{ omd_site }}
+  when: omd_site_output.rc == 1
+  become: true
+
+- name: disable all OMD config parts 
+  omd: 
+    site: '{{ omd_site }}'
+    key: '{{ item.key }}'
+    value: '{{ item.value }}'
+  with_items: 
+    - {key: APACHE_TCP_ADDR, value: '127.0.0.1' }
+    - {key: APACHE_MODE, value: 'none' }
+    - {key: CORE, value: 'none' }
+    - {key: GEARMAND, value: 'off' }
+    - {key: GEARMAND_PORT, value: '{{omd_gearmand_ip}}:{{ omd_config_gearmand_port }}' }
+    - {key: GEARMAN_WORKER, value: 'off' }
+    - {key: LIVESTATUS_TCP, value: 'off' }
+    - {key: PNP4NAGIOS, value: 'off' }
+    - {key: MOD_GEARMAN, value: '{{ omd_config_mod_gearman }}'}
+  notify: start omd site
+  when: omd_installed_cache.changed
+  become: true

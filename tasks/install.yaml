@@ -1,0 +1,41 @@
+---
+# install.yaml omd
+
+- name: check OMD repo key
+  apt_key: 
+    keyserver: keys.gnupg.net
+    id: F8C1CA08A57B9ED7
+  become: true
+
+- name: setup OMD repository
+  apt_repository: 
+    repo: 'deb {{ omd_apt_repo }} {{ ansible_distribution_release }} main'
+    state: present
+  become: true
+
+- name: apt install OMD
+  apt: 
+    name: 
+      - '{{ omd_apt_name }}'
+  become: true
+  register: omd_installed_cache
+
+- name: gather OMD version
+  shell: >
+    omd version | awk '{print $NF}'
+  register: omd_version_cache
+  changed_when: false
+
+- set_fact:
+    omd_version: "{{ omd_version_cache.stdout_lines[0] }}"
+
+- name: symlink /etc/init.d/omd
+  file: 
+    src: "/etc/init.d/omd-{{ omd_version }}"
+    dest: /etc/init.d/omd
+    owner: root
+    group: root
+    state: link
+  become: true
+
+

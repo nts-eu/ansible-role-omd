@@ -1,0 +1,83 @@
+# {{ ansible_managed }}
+CONFIG_ADMIN_MAIL=''
+CONFIG_ALERTMANAGER='off'
+CONFIG_ALERTMANAGER_TCP_ADDR='127.0.0.1'
+CONFIG_ALERTMANAGER_TCP_PORT='9094' 
+CONFIG_APACHE_MODE='ssl'
+{% if omd_feature_nagios or omd_feature_pnp4nagios %}
+CONFIG_APACHE_TCP_ADDR='0.0.0.0'
+CONFIG_APACHE_MODE='own'
+{% else %}
+CONFIG_APACHE_TCP_ADDR='{{ omd_config_apache_tcp_addr }}'
+CONFIG_APACHE_MODE='none'
+{% endif %}
+CONFIG_APACHE_TCP_PORT='{{ omd_config_apache_tcp_port }}'
+CONFIG_AUTOSTART='on'
+CONFIG_BLACKBOX_EXPORTER='off'
+CONFIG_BLACKBOX_EXPORTER_TCP_ADDR='127.0.0.1'
+CONFIG_BLACKBOX_EXPORTER_TCP_PORT='9116'
+{% if omd_feature_nagios and omd_config_core == 'none' %}
+CONFIG_CORE='nagios'
+{% else %}
+CONFIG_CORE='{{ omd_config_core }}'
+{% endif %}
+CONFIG_CRONTAB='on'
+CONFIG_DATASCRYER='off'
+CONFIG_DEFAULT_GUI='{{ omd_config_default_gui }}'
+CONFIG_DOKUWIKI_AUTH='off'
+{% if omd_feature_gearmand %}
+CONFIG_GEARMAND='on'
+CONFIG_GEARMAND_PORT='0.0.0.0:{{ omd_config_gearmand_port }}'
+{% else %}
+CONFIG_GEARMAND='{{ omd_config_gearmand }}'
+CONFIG_GEARMAND_PORT='{{omd_gearmand_ip}}:{{ omd_config_gearmand_port }}'
+{% endif %}
+CONFIG_GEARMAN_NEB='on'
+{% if omd_feature_worker %}
+CONFIG_GEARMAN_WORKER='on'
+{% else %}
+CONFIG_GEARMAN_WORKER='{{ omd_config_gearman_worker }}'
+{% endif %}
+CONFIG_GRAFANA='off'
+CONFIG_GRAFANA_TCP_PORT='8004'
+CONFIG_INFLUXDB='off'
+CONFIG_INFLUXDB_ADMIN_TCP_PORT='8084'
+CONFIG_INFLUXDB_HTTP_TCP_PORT='8087'
+CONFIG_INFLUXDB_META_TCP_PORT='8089'
+{% if omd_feature_nagios %}
+CONFIG_LIVESTATUS_TCP='on'
+{% else %}
+CONFIG_LIVESTATUS_TCP='{{ omd_config_livestatus_tcp }}'
+{% endif %}
+CONFIG_LIVESTATUS_TCP_PORT='{{ omd_config_livestatus_tcp_port }}'
+CONFIG_MKEVENTD='off'
+CONFIG_MKEVENTD_SNMPTRAP='off'
+CONFIG_MKEVENTD_SYSLOG='off'
+CONFIG_MKEVENTD_SYSLOG_TCP='off'
+CONFIG_MOD_GEARMAN='{{ omd_config_mod_gearman }}'
+CONFIG_MONGODB='off'
+CONFIG_MONGODB_TCP_PORT='27018'
+CONFIG_MULTISITE_AUTHORISATION='off'
+CONFIG_MULTISITE_COOKIE_AUTH='off'
+CONFIG_MYSQL='off'
+CONFIG_NAGFLUX='off'
+CONFIG_NAGIOS_THEME='classicui'
+CONFIG_NAGVIS_URLS='nagios'
+CONFIG_NSCA='off'
+CONFIG_NSCA_TCP_PORT='5667'
+{% if omd_feature_pnp4nagios %}
+CONFIG_PNP4NAGIOS='on'
+{% else %}
+CONFIG_PNP4NAGIOS='{{ omd_config_pnp4nagios }}'
+{% endif %}
+CONFIG_PROMETHEUS='off'
+CONFIG_PROMETHEUS_TCP_ADDR='127.0.0.1'
+CONFIG_PROMETHEUS_TCP_PORT='9091'
+CONFIG_SHINKEN_ARBITER_PORT='localhost:7770'
+CONFIG_SHINKEN_BROKER_PORT='localhost:7772'
+CONFIG_SHINKEN_POLLER_PORT='localhost:7771'
+CONFIG_SHINKEN_REACTIONNER_PORT='localhost:7769'
+CONFIG_SHINKEN_SCHEDULER_PORT='localhost:7768'
+CONFIG_SHINKEN_WEBUI_TCP_PORT='57768'
+CONFIG_THRUK_COOKIE_AUTH='on'
+CONFIG_TMPFS='on'

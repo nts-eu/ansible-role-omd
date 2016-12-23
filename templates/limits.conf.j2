@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+# /etc/security/limits.conf
+central          hard    nofile          32768
+central          soft    nofile          16384
+*                hard    nofile          32000
+*                soft    nofile          16000
+root             hard    nofile          31000
+root             soft    nofile          15000

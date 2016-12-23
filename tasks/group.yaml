@@ -1,0 +1,10 @@
+
+
+- name: add to group omd_gearman
+  add_host: 
+    hostname: "{{ inventory_hostname }}"
+    groups: omd_gearman
+  when: omd_feature_gearmand
+  changed_when: false
+
+

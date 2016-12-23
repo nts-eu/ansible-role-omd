@@ -1,0 +1,32 @@
+---
+# main.yaml omd
+
+- fail: msg="required variable 'omd_gearmand_ip' not set"
+  when: omd_gearmand_ip == false
+
+- fail: msg="required variable 'omd_mod_gearman_key' not set or length is not 32"
+  when: omd_mod_gearman_key == false or (omd_mod_gearman_key|length != 32)
+
+- name: install OMD package
+  include: install.yaml
+  tags:
+    - install
+
+- name: pre configuration for all 
+  include: preconfig.yaml
+  tags: 
+    - config
+
+- name: group omd hosts
+  include: group.yaml
+
+- name: conig omd
+  include: config.yaml
+
+- name: gearmand configuration
+  include: gearmand.yaml
+  when: omd_feature_gearmand
+
+- name: nagios configuration
+  include: nagios.yaml
+  when: omd_feature_nagios

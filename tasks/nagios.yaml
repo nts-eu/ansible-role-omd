@@ -1,0 +1,28 @@
+
+- name: enable process perfdata
+  lineinfile: 
+    dest: "/omd/sites/{{ omd_site }}/etc/pnp4nagios/nagios_gearman.cfg"
+    regexp: "^process_performance_data="
+    line: "process_performance_data=1"
+  become: true
+  notify: restart omd
+
+# - name: init.py anlegen in /opt/nts/app/mon20/worker 
+#   file: 
+#     path: /opt/nts/app/mon20/worker/__init.py__
+#     state: file
+#     owner: root 
+#     group: root 
+#   become: true
+
+- name: pythonpath erweitern
+  lineinfile:
+    dest: "/omd/sites/{{ omd_site }}/.profile"
+    line: 'export PYTHONPATH="$OMD_ROOT/lib/python:$OMD_ROOT/local/lib/python:/opt/nts/app/mon20/worker"'
+    regexp: "^export PYTHONPATH="
+  become: true
+  notify: restart omd
+
+
+
+

@@ -1,0 +1,39 @@
+
+
+- name: increase open file /etc/security/limits.conf
+  template: 
+    src: limits.conf.j2
+    dest: /etc/security/limits.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
+- name: increase shutdown time for gearmand
+  lineinfile: 
+    dest: /opt/omd/sites/{{ omd_site }}/etc/init.d/gearmand
+    regexp: '^SHUTDOWN_TIME='
+    line: 'SHUTDOWN_TIME=15'
+  become: true
+  notify: restart omd
+
+- name: increase ulimit for gearmand
+  lineinfile:
+    dest: /opt/omd/sites/{{ omd_site }}/etc/init.d/gearmand
+    insertafter: ".*# gearman opens lot of connections, so increase default ulimit"
+    regexp: " *ulimit -[Sn].*"
+    line: "ulimit -Sn 32768 >/dev/null 2>&1 || ulimit -Sn 16384 >/dev/null 2>&1 || ulimit -Sn 8192 >/dev/null 2>&1 || ulimit -Sn 4096 >/dev/null 2>&1 || ulimit -Sn 2048 >/dev/null 2>&1"
+  become: true
+  notify: restart omd
+
+- name: increase ulimit for /etc/init.d/omd
+  lineinfile: 
+    dest: /etc/init.d/omd
+    insertafter: '^OMD=.*'
+    line: "{{ item }}"
+  with_items:
+    - "ulimit -Hn 32768 >/dev/null 2>&1 || ulimit -Hn 16384 >/dev/null 2>&1 || ulimit -Hn 8192 >/dev/null 2>&1 || ulimit -Hn 4096 >/dev/null 2>&1 || ulimit -Hn 2048 >/dev/null 2>&1"
+    - "ulimit -Sn 32768 >/dev/null 2>&1 || ulimit -Sn 16384 >/dev/null 2>&1 || ulimit -Sn 8192 >/dev/null 2>&1 || ulimit -Sn 4096 >/dev/null 2>&1 || ulimit -Sn 2048 >/dev/null 2>&1"
+  become: true
+  notify: restart omd
+

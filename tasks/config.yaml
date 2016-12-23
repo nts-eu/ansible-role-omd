@@ -1,0 +1,70 @@
+
+- name: shared mod gearman key
+  template: 
+    src: secret.key.j2
+    dest: /omd/sites/{{ omd_site }}/etc/mod-gearman/secret.key
+    owner: '{{ omd_site }}'
+    group: '{{ omd_site }}'
+    mode: 0644
+  become: true
+  notify: restart omd
+
+- name: stop apache2 service
+  service: 
+    name: apache2
+    state: stopped
+  become: true
+  when: omd_feature_pnp4nagios == false and omd_feature_nagios == false
+
+- name: gearmand site {{ omd_site }} config
+  omd:
+    site: '{{ omd_site }}'
+    key: '{{ item.key }}'
+    value: '{{ item.value }}'
+  with_items: 
+    - {key: MOD_GEARMAN, value: '{{ omd_config_mod_gearman }}'}
+    - {key: GEARMAND, value: 'on' }
+    - {key: GEARMAND_PORT, value: '0.0.0.0:{{ omd_config_gearmand_port }}' }
+  notify: start omd site
+  become: true
+  when: omd_feature_gearmand
+
+- name: nagios site {{ omd_site }} config
+  omd:
+    site: '{{ omd_site }}'
+    key: '{{ item.key }}'
+    value: '{{ item.value }}'
+  with_items: 
+    - {key: APACHE_TCP_ADDR, value: '0.0.0.0' }
+    - {key: APACHE_MODE, value: 'own' }
+    - {key: CORE, value: '{{ omd_config_core }}' }
+    - {key: DEFAULT_GUI, value: '{{ omd_config_default_gui }}' }
+    - {key: LIVESTATUS_TCP, value: 'on' }
+  notify: start omd site
+  become: true
+  when: omd_feature_nagios
+
+- name: pnp4nagios site {{ omd_site }} config
+  omd:
+    site: '{{ omd_site }}'
+    key: '{{ item.key }}'
+    value: '{{ item.value }}'
+  with_items: 
+    - {key: APACHE_TCP_ADDR, value: '0.0.0.0' }
+    - {key: APACHE_MODE, value: 'own' }
+    - {key: PNP4NAGIOS, value: 'on'}
+  notify: start omd site
+  become: true
+  when: omd_feature_pnp4nagios
+
+- name: worker site {{ omd_site }} config
+  omd:
+    site: '{{ omd_site }}'
+    key: '{{ item.key }}'
+    value: '{{ item.value }}'
+  with_items: 
+    - {key: MOD_GEARMAN, value: 'on'}
+    - {key: GEARMAN_WORKER, value: 'on'}
+  notify: start omd site
+  become: true
+  when: omd_feature_worker

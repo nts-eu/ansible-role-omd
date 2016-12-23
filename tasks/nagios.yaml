@@ -1,3 +1,4 @@
+---
 
 - name: enable process perfdata
   lineinfile: 
@@ -6,14 +7,6 @@
     line: "process_performance_data=1"
   become: true
   notify: restart omd
-
-# - name: init.py anlegen in /opt/nts/app/mon20/worker 
-#   file: 
-#     path: /opt/nts/app/mon20/worker/__init.py__
-#     state: file
-#     owner: root 
-#     group: root 
-#   become: true
 
 - name: pythonpath erweitern
   lineinfile:

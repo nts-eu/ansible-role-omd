@@ -1,4 +1,4 @@
-# ansible-role-omd
+# Ansible Role: ansible-role-omd
 Ansible Role for OMD (Ubuntu and Debian)
 
 ========

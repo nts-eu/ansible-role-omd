@@ -1,49 +1,38 @@
-# Ansible Role: ansible-role-omd
-Ansible Role for OMD (Ubuntu and Debian)
+Role Name
+=========
 
-========
-
-Install and Configure OMD - The Open Monitoring Distribution
-Tested on Ubuntu. Should work for Debian
+A brief description of the role goes here.
 
 Requirements
--------
+------------
 
-Ubuntu 16.04 Server
+Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-```
-omd_feature_gearmand: false
-omd_feature_nagios: false
-omd_feature_worker: false
-omd_feature_pnp4nagios: false
+A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
-omd_gearmand_ip: false
-omd_apt_name: omd-labs-edition-daily
-omd_apt_repo: http://labs.consol.de/repo/testing/ubuntu
+Dependencies
+------------
 
-omd_site: central
-omd_user_id: 10005
-omd_group_id: 10005
+A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
-omd_config_apache_tcp_port: 5000
-omd_config_mod_gearman: "on"
-omd_config_gearmand_port: 4730
+Example Playbook
+----------------
 
-omd_config_livestatus_tcp_port: 6557
-omd_config_default_gui: thruk
-omd_config_core: nagios
-# len must be 32
-omd_mod_gearman_key: false
-```
+Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+
+    - hosts: servers
+      roles:
+         - { role: username.rolename, x: 42 }
 
 License
 -------
 
-MIT
+BSD
 
 Author Information
 ------------------
-Markus Rainer maxrainer18gmail.com
+
+An optional section for the role authors to include contact information, or a website (HTML is not allowed).

@@ -1,9 +1,9 @@
 ---
 galaxy_info:
   author: Markus Rainer
-  description: OMD Installing and Configuration
-  company: NTS AG
-  license: MIT
+  description: OMD - The Open Monitoring Distribution install and configuration
+  company: NTS Netzwerk Telekom Service AG
+  license: license (MIT)
   min_ansible_version: 1.9
   platforms:
   - name: Ubuntu

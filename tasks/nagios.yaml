@@ -17,5 +17,9 @@
   notify: restart omd
 
 
-
-
+- name: symlink omd site central to worker
+  file:
+    src: /opt/omd/sites/central
+    dest: /opt/omd/sites/worker
+    state: link
+  become: true

@@ -39,3 +39,11 @@
   notify: start omd site
   when: omd_installed_cache.changed
   become: true
+
+- name: add PYTHONPATH to .profile
+  replace:
+    path: "/opt/omd/sites/{{ omd_site }}/.profile"
+    regexp: 'export PYTHONPATH'
+    replace: 'export PYTHONPATH="$OMD_ROOT/lib/python:$OMD_ROOT/local/lib/python:/opt/nts/app/mon20/{{ omd_site }}"'
+  become: true
+

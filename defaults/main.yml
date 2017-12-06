@@ -9,8 +9,8 @@ omd_feature_pnp4nagios: false
 
 omd_gearmand_ip: false
 
-omd_apt_name: omd-labs-edition-daily
-omd_apt_repo: http://labs.consol.de/repo/testing/ubuntu
+omd_apt_name: omd
+omd_apt_repo: http://labs.consol.de/repo/stable/ubuntu
 
 omd_site: central
 omd_user_id: 10005

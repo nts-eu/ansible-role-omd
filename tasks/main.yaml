@@ -20,7 +20,7 @@
 - name: group omd hosts
   include: group.yaml
 
-- name: conig omd
+- name: config omd
   include: config.yaml
 
 - name: gearmand configuration

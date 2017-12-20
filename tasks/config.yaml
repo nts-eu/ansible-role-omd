@@ -40,6 +40,8 @@
     - {key: CORE, value: '{{ omd_config_core }}' }
     - {key: DEFAULT_GUI, value: '{{ omd_config_default_gui }}' }
     - {key: LIVESTATUS_TCP, value: 'on' }
+    - {key: GEARMAND_PORT, value: '{{ omd_gearmand_ip }}:{{ omd_config_gearmand_port }}' }
+    - {key: GEARMAN_WORKER, value: 'on' } 
   notify: start omd site
   become: true
   when: omd_feature_nagios

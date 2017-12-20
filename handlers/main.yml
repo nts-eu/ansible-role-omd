@@ -6,7 +6,16 @@
   become: true
 
 
+#  
+#- name: start omd site
+#  shell: >
+#    omd start {{ omd_site }}
+#  become: true
+
+
 - name: start omd site
   shell: >
-    omd start {{ omd_site }}
+    omd restart
   become: true
+
+  

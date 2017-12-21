@@ -54,7 +54,9 @@
   with_items: 
     - {key: APACHE_TCP_ADDR, value: '0.0.0.0' }
     - {key: APACHE_MODE, value: 'own' }
-    - {key: PNP4NAGIOS, value: 'on'}
+    - {key: PNP4NAGIOS, value: 'gearman'}
+    - {key: GEARMAN_WORKER, value: 'on' }
+    - {key: DEFAULT_GUI, value: 'pnp4nagios' }
   notify: start omd site
   become: true
   when: omd_feature_pnp4nagios

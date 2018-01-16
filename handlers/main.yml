@@ -18,4 +18,3 @@
     omd restart
   become: true
 
-  

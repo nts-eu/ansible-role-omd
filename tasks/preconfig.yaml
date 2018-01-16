@@ -44,8 +44,9 @@
   replace:
     path: "/opt/omd/sites/{{ omd_site }}/.profile"
     regexp: 'export PYTHONPATH.*'
-    replace: 'export PYTHONPATH="$OMD_ROOT/lib/python:$OMD_ROOT/local/lib/python:/opt/nts/app/mon20/{{ omd_site }}"'
+    replace: 'export PYTHONPATH="/opt/nts/app/mon20/{{ omd_site }}"'
   become: true
   tags:
     - profile
 
+ 

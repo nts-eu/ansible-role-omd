@@ -8,13 +8,13 @@
   become: true
   notify: restart omd
 
-- name: pythonpath erweitern
-  lineinfile:
-    dest: "/omd/sites/{{ omd_site }}/.profile"
-    line: 'export PYTHONPATH="$OMD_ROOT/lib/python:$OMD_ROOT/local/lib/python:/opt/nts/app/mon20/worker"'
-    regexp: "^export PYTHONPATH="
-  become: true
-  notify: restart omd
+#- name: pythonpath erweitern
+#  lineinfile:
+#    dest: "/omd/sites/{{ omd_site }}/.profile"
+#    line: 'export PYTHONPATH="$OMD_ROOT/lib/python:$OMD_ROOT/local/lib/python:/opt/nts/app/mon20/worker"'
+#    regexp: "^export PYTHONPATH="
+#  become: true
+#  notify: restart omd
 
 
 - name: symlink omd site central to worker

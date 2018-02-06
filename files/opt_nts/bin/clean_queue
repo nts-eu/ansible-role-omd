@@ -1,0 +1,129 @@
+#!/bin/bash
+#
+# /opt/nts/bin/clean_queue
+#   vorbeugen bei netzwerkausfall
+#
+
+queue_hostgroup_max=300
+queue_hostgroup_total_max=10000
+queue_perfdata_max=1000000  # ca. 250.000 plots --> cache last 4 values/plot
+queue_checkresults_max=200000  # ca 5 minuten
+
+host="194.50.28.80"
+port=4730
+
+log_actions=/tmp/clean_queue_hostgroup.action_log
+err_file="/tmp/queue_reset_"
+script_err_to=hostgroup_ntsgraz
+own=central
+
+gm=/opt/omd/versions/default/bin/gearman
+
+gearman_out="$( (echo status; sleep 3) | telnet $host $port 2>/dev/null | egrep -v 'Trying|Escape character|Connected to' | sort )"
+
+# echo "$gearman_out"
+
+if [ "$gearman_out" = "" ]
+then
+        echo "unable to read queues from gearmand!!"
+        date  >>$log_actions
+        echo "unable to read queues from gearmand!!" >>$log_actions
+        echo "clean_queue_hostgroup: unable to read queues from gearmand!!" >$err_file$script_err_to
+        chown $own.$own $err_file$script_err_to 
+        chmod 666 $err_file$script_err_to
+        exit 2
+fi
+
+
+######################## worker jobs (hostgroup) ##############################
+
+o="$( echo "$gearman_out" | egrep '(hostgroup_)' )"
+
+hostgroup_total=$(echo "$o"| awk '$1 ~ "hostgroup_" { c+=$2 }
+                                END { print c}' )
+
+echo "$hostgroup_total jobs in hostgroup-queues"
+
+echo "$o" | while read queue jobs run worker
+do
+        # Function name : A string denoting the name of the function of the job
+        # Number in queue : A positive integer indicating the total number of jobs for this function in the queue. This includes currently running ones as well (next column)
+        # Number of jobs running : A positive integer showing how many jobs of this function are currently running
+        # Number of capable workers : A positive integer denoting the maximum possible count of workers that could be doing this job. 
+        #                           Though they may not all be working on it due to other tasks holding them busy.
+        
+        [ "$queue" = "" ] && continue
+
+        if [ "$worker" = 0  -o  "$hostgroup_total" -gt "$queue_hostgroup_total_max" ]
+        then   # worker is not connected  or  hostgroup_total too high
+
+            (( wait = jobs - run ))
+            case "$queue" in
+            hostgroup_*_[123456789])
+                    continue
+                    ;;
+            hostgroup_*)
+                    if [ "$wait" -gt "$queue_hostgroup_max" ]
+                    then
+                        (( delete = wait - queue_hostgroup_max ))
+                        echo "delete $delete jobs from queue $queue!"
+                        date  >>$log_actions
+                        echo "delete $delete jobs from queue $queue!" >>$log_actions
+                        echo "delete $delete jobs from queue $queue!" >$err_file$queue
+                        chown $own.$own $err_file$queue
+                        chmod 666 $err_file$queue
+
+                        $gm -p $port -h $host -f $queue  -t 2000 -w -c$delete >/dev/null
+                    fi
+                    ;;
+            esac
+        fi
+done
+
+
+
+
+######################## pnp plots (perfdata) ##############################
+
+echo "$gearman_out" | egrep '(perfdata)' | read queue jobs run worker
+
+(( wait = jobs - run ))
+
+if [ "$wait" -gt "$queue_perfdata_max" ]
+then
+    (( delete = wait - queue_perfdata_max ))
+    echo "delete $delete jobs from queue $queue!"
+    date  >>$log_actions
+    echo "delete $delete jobs from queue $queue!" >>$log_actions
+    echo "delete $delete jobs from queue $queue!" >$err_file$queue
+    chown $own.$own $err_file$queue
+    chmod 666 $err_file$queue
+
+    $gm -p $port -h $host -f $queue  -t 2000 -w -c$delete >/dev/null
+fi
+
+
+
+
+
+
+######################## check_results ##############################
+
+echo "$gearman_out" | egrep '(check_results)' | read queue jobs run worker
+
+(( wait = jobs - run ))
+
+if [ "$wait" -gt "$queue_checkresults_max" ]
+then
+    (( delete = wait - queue_checkresults_max ))
+    echo "delete $delete jobs from queue $queue!"
+    date  >>$log_actions
+    echo "delete $delete jobs from queue $queue!" >>$log_actions
+    echo "delete $delete jobs from queue $queue!" >$err_file$queue
+    chown $own.$own $err_file$queue
+    chmod 666 $err_file$queue
+
+    $gm -p $port -h $host -f $queue  -t 2000 -w -c$delete >/dev/null
+fi
+
+

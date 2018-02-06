@@ -1,0 +1,39 @@
+#   rechne
+
+echo "bitte Werte eingeben (Ende q, Zwischensumme =, Loeschen c)"
+awk 'BEGIN {re="+"; printf("+ ");}
+
+        { for (i=1;i<=NF;i++)
+                {
+                  gsub("\+"," + ")
+                  gsub("-"," - ")
+                  gsub("\*"," * ")
+                  gsub("/"," / ")
+                  gsub("="," = ")
+                  gsub("c"," c ")
+                  gsub("q"," q ")
+                  op=$i;
+
+                  if (op=="c")  {ergeb=0;re="+";}
+                  if (op=="="||op=="c")  {printf("-----------------\n%15.5f %s\n",ergeb,op); printf("%s ",re);}
+                  if (op=="q")  { exit;}
+                  if (op=="="||op=="c")  { continue;}
+
+                  wert=$i;
+                  #if (NF > 1 )  { wert=$2;}
+                  if (i < NF  && ( op=="+" || op=="-" || op=="*" || op=="/" ) )  { wert=$(i+1); i++;}
+
+                  if (op=="+")  {re=op; if (NF==1){printf("%f %s ",ergeb,re); next;} ; }
+                  if (op=="-")  {re=op; if (NF==1){printf("%f %s ",ergeb,re); next;} ; }
+                  if (op=="*")  {re=op; if (NF==1){printf("%f %s ",ergeb,re); next;} ; }
+                  if (op=="/")  {re=op; if (NF==1){printf("%f %s ",ergeb,re); next;} ; }
+
+                  #print "\ndebug:   ergeb="ergeb"  re="re"  wert="wert"\n";
+                  if (re=="+")  {ergeb=ergeb+wert;  continue;}
+                  if (re=="-")  {ergeb=ergeb-wert;  continue;}
+                  if (re=="*")  {ergeb=ergeb*wert;  continue;}
+                  if (re=="/")  {ergeb=ergeb/wert;  continue;}
+                } #for
+                printf("%f %s ",ergeb,re);
+        }
+     END        {printf("=================\n%15.5f\n",ergeb)}'

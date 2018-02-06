@@ -23,3 +23,33 @@
     dest: /opt/omd/sites/worker
     state: link
   become: true
+
+- name: create folder /opt/nts
+  file:
+    dest: /opt/nts
+    state: directory
+    mode: 0755
+    owner: central
+  become: true
+
+- name: copy /opt/nts/bin
+  copy: 
+    src: "files/opt_nts"
+    dest: "/opt/nts"
+    mode: 0755
+    directory_mode: 0755
+    owner: central
+  become: true
+
+- name: symlinks in /opt/nts/bin
+  file:
+    src:  "/opt/nts/app/mon20/worker/checks/{{ item }}"
+    dest: "/opt/nts/bin/{{ item }}"
+    state: link
+    force: yes
+  with_items: 
+    - log_viewer
+    - show_nagios_health
+    - stat_viewer
+  become: true
+  

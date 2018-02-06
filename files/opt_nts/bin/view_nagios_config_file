@@ -1,0 +1,24 @@
+#! /bin/bash
+#######################
+
+cat $1 | awk '
+( $1=="define" && blk=="h" ) {print "H: "hostH" "host; blk=""; host=""; }
+( $1=="define" && blk=="s" ) {print "S: "svcH"/"svcD" "svc; blk=""; svc=""; }
+
+( $1=="define" && $2~/host/ ) {blk="h"; host=""; next; }
+( blk=="h" && $1 =="host_name" ) { hostH = $2; next; }
+( blk=="h" && $1 =="check_command" ) { host = host $2" "$3" " $4" "$5" "$6" "$7" "$8" "$9" "; next; }
+( blk=="h" && $1 =="_HOSTTYPE" ) { host = host $2" "; next; }
+( blk=="h" && $1 =="_HOSTID" ) { host = host $2" "; next; }
+
+( $1=="define" && $2~/service/ ) {blk="s"; svc=""; next; }
+( blk=="s" && $1 =="service_description" ) { svcD=$2 }
+( blk=="s" && $1 =="host_name" ) { svcH= $2; next; }
+( blk=="s" && $1 =="check_command" ) { svc = svc $2" "$3" " $4" "$5" "$6" "$7" "$8" "$9" "; next; }
+#( blk=="s" && $1 =="_CHECKID" ) { svc= $2; next; }
+
+END {
+        if ( blk=="h" ) {print "H: "hostH" "host; blk=""; host=""; }
+        if ( blk=="s" ) {print "S: "svcH"/"svcD" "svc; blk=""; svc=""; }
+    }
+' |  sort -k2,2 -k1,1 

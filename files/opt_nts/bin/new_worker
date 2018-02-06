@@ -1,0 +1,274 @@
+#! /bin/bash
+
+# outputzeilen beginnend mit EXIT, CRIT, WARN oder OK werden im Gui gezeigt
+IDworker=1  # ntsgraz
+IDms=27     # MS-4900009.07
+IDloc=440   # NTS Kunden
+IDhtype=31  # Linux
+
+Dhost=mmdb01.nts.eu
+Duser=max
+Dpw=gruen1
+
+DmysqlSel="mysql --batch --silent --raw -h $Dhost -u $Duser --password="$Dpw" -e "
+DmysqlUpd="mysql --batch --silent --raw -h $Dhost -u $Duser --password="$Dpw" -e "
+# DmysqlUpd="echo"   # debug
+
+gm=/opt/omd/versions/default/bin/gearman
+gm_srv=194.50.28.80
+gm_port=4730
+export LD_LIBRARY_PATH=/omd/sites/central/local/lib:/omd/sites/central/lib
+gm_back="new_worker_result"
+
+# # # # # # 
+
+[ "$clu" = "" ]    && read -p "Clustername                                 -> " clu
+[ "$descr" = "" ] &&  read -p "Description                                 -> " descr
+echo
+[ "$id" = "" ] &&     read -p "NodeId                                      -> " id
+[ "$type" = "" ] &&   read -p "Type: ESX/Raspberry                   [E/r] -> " type
+echo
+[ "$j1" = "" ] &&     read -p "Job: Inventory                        [y/N] -> " j1
+[ "$j2" = "" ] &&     read -p "Job: Rsync                            [y/N] -> " j2
+[ "$j3" = "" ] &&     read -p "Job: Counter                          [y/N] -> " j3
+[ "$j4" = "" ] &&     read -p "Job: Backup                           [y/N] -> " j4
+[ "$j5" = "" ] &&     read -p "Job: Macaddresses                     [y/N] -> " j5
+echo
+[ "$loc" = "" ] &&    read -p "Root Location                               -> " loc
+[ "$snmp" = "" ] &&   read -p "snmp RO community                           -> " snmp
+echo
+[ "$cluMS" = "" ] &&  read -p "custom managed_service_name to join worker  -> " custMS
+
+###############################
+
+deploy_nagios=n
+reload_jobqueue=n
+new_repo=n
+
+case "$clu" in
+?????*)
+        : ;;
+*)
+        echo "EXIT_ERROR - clustername ($clu) must have at least 5 characters" 
+        exit 2 
+        ;;
+esac
+
+echo "adding new worker ${clu}_$id ($descr) ..."
+
+case "$id" in
+    1|2|3|4|5|6|7|8|9)
+        : ;;
+    *)
+        echo "EXIT_ERROR - wrong nodeId!!" 
+        exit 2 
+        ;;
+esac
+
+# # # #
+
+echo
+#echo "OK - test"
+#echo "WARN - test"
+#echo "CRIT - test"
+
+# # # #
+
+IDclu=$($DmysqlSel 'select id from MonConf.worker where name="'$clu'"; ')
+if [ "$IDclu" = "" ] 
+then
+  echo "--- new cluster .."
+  $DmysqlUpd 'insert into MonConf.worker (name, description) values ("'$clu'","'"$descr"'"); '
+  IDclu=$($DmysqlSel 'select id from MonConf.worker where name="'$clu'"; ')
+    if [ "$IDclu" = "" ] 
+    then
+        echo "EXIT_ERROR - failed to add Cluster $clu"
+        exit 2
+    else
+        echo "OK - Cluster $clu added"
+    fi
+fi 
+echo "               Cluster $clu    --> IDclu=$IDclu"
+
+# # # #
+
+IDrepo=$($DmysqlSel 'select id from MonConf.repository where name="'$clu'"; ')
+if [ "$IDrepo" = "" ] 
+then
+  $DmysqlUpd 'insert into MonConf.repository (name, detailmonth) values ("'$clu'",3); '
+  IDrepo=$($DmysqlSel 'select id from MonConf.repository where name="'$clu'"; ')
+  new_repo=y
+fi 
+echo "               Repository $clu --> IDrepo=$IDrepo"
+
+# # # #
+
+
+HgWoNo=$($DmysqlSel 'select hostgroup from MonConf.workernode where idWorker="'$IDclu'" and identifier="'$id'"; ')
+if [ "$HgWoNo" = "" ] 
+then
+  echo "--- new node .."
+  hg=esx_worker
+  if [ "$type" = r ]
+  then
+    hg=raspi_worker
+  fi
+  $DmysqlUpd 'insert into MonConf.workernode (idWorker, identifier, hostgroup) values ("'$IDclu'","'$id'","'$hg'"); '
+  HgWoNo=$($DmysqlSel 'select hostgroup from MonConf.workernode where idWorker="'$IDclu'" and identifier="'$id'"; ')
+  deploy_nagios=y
+    if [ "$HgWoNo" = "" ] 
+    then
+        echo "EXIT_ERROR - failed to add Node ${clu}_$id"
+        exit 2
+    else
+        echo "OK - Node ${clu}_$id added"
+    fi
+fi 
+echo "               Node ${clu}_$id     --> $HgWoNo"
+
+# # # #
+echo
+# # # #
+
+for j in 1 2 3 4 5
+do
+  job=$(eval echo \$j$j)
+  case "$job" in 
+  y|Y) $DmysqlUpd 'insert ignore into MonConf.jobqueueworker (idJobQueue, idWorker) values ("'$j'","'$IDclu'"); ' 
+        reload_jobqueue=y
+        ;;
+  esac
+done
+Jobs=$($DmysqlSel 'select idJobQueue from MonConf.jobqueueworker where idWorker="'$IDclu'"; ')
+echo "               JobsIDs on ${clu}: $(echo $Jobs)"
+
+#echo "$Jobs"
+
+# # # #
+echo
+# # # #
+
+nagname="w_${clu}_$id"
+IDhost=$($DmysqlSel 'select id from MonConf.host  where idWorker="'$IDworker'" and name = "'$nagname'"; ')
+if [ "$IDhost" = "" ]
+then
+  echo "--- new host .."
+  $DmysqlUpd 'insert into MonConf.host (name,ipaddress,description,idHostType,idWorker,idLocation,monitoring,inventory,backup) values ("'$nagname'","127.0.0.1","'"$descr"'","'$IDhtype'","'$IDworker'","'$IDloc'",0,0,0); '
+  IDhost=$($DmysqlSel 'select id from MonConf.host  where idWorker="'$IDworker'" and name = "'$nagname'"; ')
+fi
+echo "               hostid --> $IDhost"
+if [ "$IDhost" = "" ]
+then
+    echo "EXIT_ERROR - failed to add host"
+    exit 2
+fi
+
+# # # #
+
+$DmysqlUpd 'insert ignore into MonConf.hostmanagedservice ( idManagedService, idHost) values ( "'$IDms'","'$IDhost'"); '
+$DmysqlUpd 'insert ignore into inventory.device (id,sysName)  values ( "'$IDhost'", "Worker"); '
+
+#
+
+IDcustMs=$($DmysqlSel 'select id from MonConf.managedservicelocal  where nts_managedservice="'$custMS'" ; ')
+if [ "$IDcustMs" != "" ]
+then
+    echo "--- added custom MS (id $IDcustMs) .."
+    $DmysqlUpd 'insert ignore into MonConf.hostmanagedservice ( idManagedService, idHost) values ( "'$IDcustMs'","'$IDhost'"); '
+fi
+
+MSids=$($DmysqlSel 'select group_concat(idManagedService) from MonConf.hostmanagedservice where idHost="'$IDhost'" group by idHost; ')
+echo "               MS IDs --> $MSids"
+
+# # # #
+echo
+# # # #
+
+if [ "$loc" != "" ]
+then
+  IDloc=$($DmysqlSel 'select id from MonConf.location  where name="'"$loc"'" ; ')
+  if [ "$IDloc" = "" ]
+  then
+    echo "--- new root location .."
+    $DmysqlUpd 'insert into MonConf.location (name,description,hostnameRegEx) values ("'"$loc"'","'"$loc"'",".*"); '
+    IDloc=$($DmysqlSel 'select id from MonConf.location  where name="'"$loc"'" ; ')
+  fi
+    if [ "$IDloc" = "" ] 
+    then
+        echo "EXIT_ERROR - failed to add location $loc"
+        exit 2
+    else
+        echo "OK - location $loc added"
+    fi
+  echo "               locationid       --> $IDloc"
+fi
+
+# # # #
+
+if [ "$snmp" != "" ]
+then
+  accTempl="$loc default"
+  IDacc=$($DmysqlSel 'select id from MonConf.accesstemplate  where description="'"$accTempl"'" ; ')
+  if [ "$IDacc" = "" ]
+  then
+    echo "--- new access template ($accTempl) .."
+    $DmysqlUpd 'insert into MonConf.accesstemplate (description,private,roCommunity,snmptimeout,snmpretry,snmpversion) values ("'"$accTempl"'",0,"'"$snmp"'",5,1,2); '
+    IDacc=$($DmysqlSel 'select id from MonConf.accesstemplate  where description="'"$accTempl"'" ; ')
+
+    if [ "$IDacc" = "" ] 
+    then
+        echo "EXIT_ERROR - failed to add access template $accTempl"
+        exit 2
+    else
+        echo "OK - access template $accTempl added"
+    fi
+  fi
+  echo "               accesstemplateid --> $IDacc"
+fi
+
+
+# # # #
+
+if [ "$deploy_nagios" = y ]
+then
+    wget --no-check-certificate https://mmnag01.nts.at/central/nts_maintain/maintain_nagios.cgi?worker_cmd=monitoring_worker -O - | 
+        grep "configuration monitoring_worker ready" &&
+    wget --no-check-certificate https://mmnag01.nts.at/central/nts_maintain/maintain_nagios.cgi?worker_cmd=reload -O - |
+        grep "new monitoring configuration activated" && 
+    echo 'OK - Nagios configuration Worker-Checks activated' || echo 'WARN - Nagios configuration Worker-Checks failed!!! '
+fi
+
+
+# # # #
+
+if [ "$reload_jobqueue" = y ]
+then
+    echo " please restart JobQueue in frontend (configuration/administration/JobQueues) !!!!!!!!!!"
+fi
+
+
+# # # # 
+
+
+
+if [ "$new_repo" = y ]
+then
+    if [ "$(echo "$Jobs"| grep 4)" = 4 ]
+    then
+        echo " please join Repository $IDrepo to Managed Services !!!!!!!!!"
+    fi
+fi
+
+
+
+
+# # # # # queue in rsync-job
+
+q=${clu}_${id}_ma
+
+echo -e "<header> <jobid>$q-init-$(date +%Y%m%d-%H%M)</jobid> <jobDistinguisher>execmacro</jobDistinguisher> <queueReturn>$gm_back</queueReturn> </header>rsync_all" |
+    $gm -p $gm_port -h $gm_srv -b -f $q
+
+
+echo "EXIT_OK - bye"
+

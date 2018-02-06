@@ -1,0 +1,55 @@
+# mmnagios version
+  #
+        #
+export PS1="$(tput rev)\$(date +%H:%M:%S) \u@\h:\w$(tput sgr0)\n# ";
+export PATH="$PATH:/opt/nts/bin/:/opt/nts/app/mon20/worker/checks/:/opt/omd/versions/default/lib/nagios/plugins/"
+export PAGER="less -eFXR"
+export PYTHONPATH="/opt/nts/app/mon20/worker"
+
+export HISTFILE=~/.bash_history.didi
+export HISTTIMEFORMAT="$(tput rev)%y%m%d-%T$(tput sgr0) "
+export PROMPT_COMMAND='history -a'
+chmod 666 $HISTFILE 2>/dev/null
+history -r
+
+export EDITOR=vi;
+unset LS_COLORS;
+
+set -o vi;
+
+alias ll="ls -la ";
+# alias h="fc -l -50";
+# alias H="fc -l -500";
+# alias hg="fc -l -1000| grep "
+alias h="history 50";
+alias H="history 500";
+alias hg="history 2000| grep "
+alias r="fc -s "
+alias psg="ps -ef | grep "
+alias ncat="egrep -v '(^\s*#|^$)' "
+
+#alias nag_res="cat /usr/local/groundwork/nagios/etc/resource.cfg /usr/local/groundwork/nagios/etc/*/resource.cfg 2>/dev/null |egrep -v '^$|^#' |sort -u"
+
+alias cdl="cd /opt/omd/sites/central/var/log"
+alias cdw="echo wrong node"
+alias cdnc="cd /opt/nts/app/mon20/worker/checks"
+alias cdn="cd /omd/sites/central/etc/naemon/conf.d"
+alias cds="cd $(ls -d /usr/share/nts/scripts /opt/nts/scripts /opt/nts/bin 2>/dev/null| head -1) "
+alias cdos="cd /opt/omd/sites/central"
+alias cdose="cd /opt/omd/sites/central/etc"
+alias cdosv="cd /opt/omd/sites/central/var"
+alias cdpt="echo wrong node"
+alias cdpp="echo wrong node"
+
+export VIMINIT="set showmatch showmode notimeout number t_ti= t_te= softtabstop=4 tabstop=4 shiftwidth=4 expandtab
+syntax off"
+
+# vi:
+# http://vimdoc.sourceforge.net/htmldoc/starting.html
+# *VIMINIT* *.vimrc* *_vimrc* *EXINIT* *.exrc* *_exrc* *$MYVIMRC*
+#   Four places are searched for initializations.  The first that exists is used, the others are ignored.
+# :syntax off
+# :set nohlsearch
+# :set t_Co=0 ruler
+# :set sm showmode notimeout number  t_ti= t_te= softtabstop=8 tabstop=8 shiftwidth=8 expandtab
+

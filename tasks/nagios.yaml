@@ -32,10 +32,10 @@
     owner: central
   become: true
 
-- name: copy /opt/nts/bin
+- name: copy /opt/nts/*
   copy: 
-    src: "files/opt_nts"
-    dest: "/opt/nts"
+    src: "files/opt/nts"
+    dest: "/opt"
     mode: 0755
     directory_mode: 0755
     owner: central
@@ -53,3 +53,12 @@
     - stat_viewer
   become: true
   
+
+- name: copy neamon config
+  copy: 
+    src: "files/naemon_conf"
+    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/conf.d"
+    mode: 0755
+    directory_mode: 0755
+    owner: central
+  become: true

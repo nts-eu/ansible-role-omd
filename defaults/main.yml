@@ -8,6 +8,8 @@ omd_feature_worker: false
 omd_feature_pnp4nagios: false
 
 omd_gearmand_ip: false
+omd_pnp_ip: false
+omd_pnp_url: false
 
 omd_apt_name: omd
 omd_apt_repo: http://labs.consol.de/repo/stable/ubuntu

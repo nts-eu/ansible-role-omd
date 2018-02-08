@@ -7,24 +7,22 @@ define hostgroup {
 
 define host{
   name                            mm-host
-  use                             generic-host
+  use                             generic-plot-host
   normal_check_interval           5
   max_check_attempts              3   
   retry_check_interval            2   
   register                        0
-  action_url           https://mmpnp01.nts.eu/central/pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=_HOST_&view=1' class='tips' rel='https://mmpnp01.nts.eu/central/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=_HOST_&view=1
   contact_groups                 none
 }
 
 define service{
   name                            mm-service
-  use                             generic-service
+  use                             generic-plot-service
   normal_check_interval           5
   max_check_attempts              3   
   retry_check_interval            2   
   register                        0
   process_perf_data               0
-  action_url           https://mmpnp01.nts.eu/central/pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=$SERVICEDESC$&view=1' class='tips' rel='https://mmpnp01.nts.eu/central/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=$SERVICEDESC$&view=1
   contact_groups                 none
 }
 ######################################################################

@@ -62,3 +62,16 @@
     directory_mode: 0755
     owner: central
   become: true
+
+- name: install mm-plot-template 
+  template: 
+    src: mm_plot_template.j2
+    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/conf.d/mm_plot_templates.cfg"
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  tags: didi
+  
+  
+  

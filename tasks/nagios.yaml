@@ -32,14 +32,14 @@
     owner: central
   become: true
 
-- name: copy /opt/nts/*
-  copy: 
-    src: "files/opt/nts"
-    dest: "/opt"
-    mode: 0755
-    directory_mode: 0755
-    owner: central
-  become: true
+#- name: copy /opt/nts/*
+#  copy: 
+#    src: "files/opt/nts"
+#    dest: "/opt"
+#    mode: 0755
+#    directory_mode: 0755
+#    owner: central
+#  become: true
 
 - name: symlinks in /opt/nts/bin
   file:

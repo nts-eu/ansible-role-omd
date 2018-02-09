@@ -29,7 +29,7 @@
     dest: /opt/nts
     state: directory
     mode: 0755
-    owner: central
+    #owner: central
   become: true
 
 #- name: copy /opt/nts/*

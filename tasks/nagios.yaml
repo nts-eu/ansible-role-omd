@@ -63,6 +63,15 @@
     owner: central
   notify: restart omd
   become: true
+  
+- name: create file /omd/sites/central/etc/naemon/conf.d/maintain.log
+  file:
+    path: /omd/sites/central/etc/naemon/conf.d/maintain.log
+    state: touch
+    mode: 0666
+    #owner: central
+  become: true
+  tags: didi
 
 - name: install resource.cfg 
   template: 

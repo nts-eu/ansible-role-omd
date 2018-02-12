@@ -61,7 +61,19 @@
     mode: 0755
     directory_mode: 0755
     owner: central
+  notify: restart omd
   become: true
+
+- name: install resource.cfg 
+  template: 
+    src: resource_cfg.j2
+    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/resource.cfg"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart omd
+  become: true
+  
 
 - name: install mm-plot-template 
   template: 
@@ -70,8 +82,19 @@
     owner: root
     group: root
     mode: 0644
+  notify: restart omd
   become: true
-  tags: didi
   
+- name: copy apache config
+  copy: 
+    src: "files/apache_conf/nts_maintain.conf"
+    dest: "/opt/omd/sites/{{ omd_site }}/etc/apache/conf.d"
+    mode: 0755
+    directory_mode: 0755
+    owner: central
+  become: true
+  notify: restart omd
+  tags: didi
+
   
   

@@ -1,0 +1,31 @@
+## {{ ansible_managed }} 
+############################################
+# OMD settings, please use them to make your config
+# portable, but dont change them
+$USER1$=/omd/sites/central/lib/nagios/plugins
+$USER2$=/omd/sites/central/local/lib/nagios/plugins
+$USER3$=central
+$USER4$=/omd/sites/central
+############################################
+# set your own macros here:
+
+# gearman
+$USER5$={{ mm_gearmand_ip }}
+$USER6$=4730
+
+# frontend
+$USER7$={{ mm_frontend_ip }}
+
+# mysql
+$USER8$={{ mm_mysql_server }}
+
+# pnp
+$USER9$={{ mm_pnp_server }}
+
+# stunnel
+$USER10$={{ mm_stunnel_ip }}
+
+# naemon
+$USER11$={{ mm_livestatus_server }}
+
+

@@ -14,6 +14,8 @@ omd_pnp_url: false
 omd_apt_name: omd
 omd_apt_repo: http://labs.consol.de/repo/stable/ubuntu
 
+omd_check_repo_key: true
+
 omd_site: central
 omd_user_id: 10005
 omd_group_id: 10005

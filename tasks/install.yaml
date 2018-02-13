@@ -1,6 +1,8 @@
 ---
 # install.yaml omd
 
+# CLI if proxy
+# sudo apt-key adv --keyserver keys.gnupg.net --keyserver-options http-proxy=XXXX --recv-keys F8C1CA08A57B9ED7
 - name: check OMD repo key
   apt_key: 
     keyserver: keys.gnupg.net

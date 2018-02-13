@@ -8,6 +8,8 @@
     keyserver: keys.gnupg.net
     id: F8C1CA08A57B9ED7
   become: true
+  when: omd_check_repo_key
+  
 
 - name: setup OMD repository
   apt_repository: 

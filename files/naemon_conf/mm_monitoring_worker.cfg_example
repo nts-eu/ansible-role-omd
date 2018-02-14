@@ -1,0 +1,70 @@
+define host {
+  host_name     manmon_w_example_1
+  alias         Worker1 Example
+  use           worker
+  __WORKER_NANMEID example_1
+  __WORKER_QUEUE   hostgroup_example_1
+  __WORKER_NAME example
+  _WORKER_HASH  191177335353463e95d4fc512895998e
+  _HOSTID       0815
+  _MS           [MS-4711]
+  check_command nc_business_logic!-N manmon -H example_1 -S "appliance|disk|load|uptime|vmstat" --freshness
+}
+define service {
+     service_description appliance
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_appliance 
+}
+define service {
+     service_description gearman
+     host_name           manmon_w_example_1
+     use                 worker_gearman 
+}
+define service {
+     service_description disk
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_disk 
+}
+define service {
+     service_description vmstat
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_vmstat 
+}
+define service {
+     service_description uptime
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_uptime 
+}
+define service {
+     service_description timediff2nagios
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_timediff2nagios 
+}
+define service {
+     service_description closed_sessions
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_closed_sessions 
+}
+define service {
+     service_description intf_bandwidth
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 worker_intf_bandwidth 
+}
+define service {
+     service_description load
+     host_name           manmon_w_example_1
+     _WORKER             hostgroup_example_1
+     use                 esx_worker_load 
+}
+
+
+
+
+

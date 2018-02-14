@@ -500,10 +500,22 @@ define service {
 ######################################################################
 
 define host {
-  host_name                      manmon_mmSshP01
-  alias                          Provisioning Server und SplunkForwarder
+  host_name                      manmon_mmSquid01
+  alias                          Proxy
   use                            my_central
-  address                        $USER13$
+  address                        {{ mm_sshproxy_ip }}
+  #_HOSTID                        2564
+  #notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
+}
+
+
+######################################################################
+
+define host {
+  host_name                      manmon_mmSshP01
+  alias                          TunnelEndpoint
+  use                            my_central
+  address                        {{ mm_sshproxy_ip }}
   #_HOSTID                        2564
   #notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
 }

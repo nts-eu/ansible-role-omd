@@ -64,7 +64,7 @@ define command {
 
 define command {
   command_name    check_nagios_state
-  command_line    python $USER32$/check_nagios_state.py --livestatus_host 194.50.28.42 
+  command_line    python $USER32$/check_nagios_state.py --livestatus_host $USER11$ 
 }
 
 
@@ -85,7 +85,7 @@ define host {
   _MS                            [MS-4900009.07]
   _LOCATION                      RZ Raiffeisen
   _THRUK_ACTION_MENU             host_menu
-  notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
+  #notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
   register                       0
 }
 
@@ -95,15 +95,15 @@ define host {
   host_name                      manmon_mmDb01
   alias                          MySqlServer
   use                            my_central
-  address                        194.50.28.41
-  _HOSTID                        2560
+  address                        {{ mm_mysql_server }}
+  #_HOSTID                        2560
 }
 
 define service {
   service_description            mysql_dashboard_daily
   host_name                      manmon_mmDb01
   use                            mm-service
-  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_dashboard.sh -m d -a 3 -u max -p gruen1 -H 194.50.28.41
+  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_dashboard.sh -m d -a 3 -u max -p gruen1 -H $USER8$
   normal_check_interval          240
   retry_check_interval           120
   max_check_attempts             4
@@ -115,7 +115,7 @@ define service {
   service_description            mysql_dashboard_monthly
   host_name                      manmon_mmDb01
   use                            mm-service
-  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_dashboard.sh -m m -a 5 -u max -p gruen1 -H 194.50.28.41
+  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_dashboard.sh -m m -a 5 -u max -p gruen1 -H $USER8$
   normal_check_interval          240
   retry_check_interval           120
   max_check_attempts             4
@@ -127,7 +127,7 @@ define service {
   service_description            mysql_intfcounter_daily
   host_name                      manmon_mmDb01
   use                            mm-service
-  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_intfcounter.sh -m d -a 20 -u max -p gruen1 -H 194.50.28.41
+  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_intfcounter.sh -m d -a 20 -u max -p gruen1 -H $USER8$
   normal_check_interval          240
   retry_check_interval           120
   max_check_attempts             4
@@ -139,7 +139,7 @@ define service {
   service_description            mysql_intfcounter_monthly
   host_name                      manmon_mmDb01
   use                            mm-service
-  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_intfcounter.sh -m m -a 15 -u max -p gruen1 -H 194.50.28.41
+  check_command                  nc_bash_generic!/opt/nts/app/mon20/worker/checks/check_mysql_intfcounter.sh -m m -a 15 -u max -p gruen1 -H $USER8$
   normal_check_interval          240
   retry_check_interval           120
   max_check_attempts             4
@@ -152,15 +152,15 @@ define host {
   host_name                      manmon_mmQueue01
   alias                          QueueServer
   use                            my_central
-  address                        194.50.28.80
-  _HOSTID                        2566
+  address                        {{ omd_gearmand_ip }}
+  #_HOSTID                        2566
 }
 
 define service {
   service_description            gearman_unmonitored_worker
   host_name                      manmon_mmQueue01
   use                            mm-service
-  check_command                  check_gearman_cluster!-H $HOSTADDRESS$ -p 4730 -u
+  check_command                  check_gearman_cluster!-H $HOSTADDRESS$ -p $USER6$ -u
   normal_check_interval          10
   process_perf_data              0
   action_url
@@ -171,7 +171,7 @@ define service {
   host_name                      manmon_mmQueue01
   use                            mm-service
   process_perf_data              1
-  check_command                  nc_tcp!-H $HOSTADDRESS$ -p 4730
+  check_command                  nc_tcp!-H $HOSTADDRESS$ -p $USER6$
 }
 
 define service {
@@ -179,8 +179,8 @@ define service {
   host_name                      manmon_mmQueue01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
-  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s nag+194.50.28.42+60+100-pnp+194.50.28.43+15+50-proxy+194.50.28.81+8000+12000-gm_total+194.50.28.80:4730+10000+20000'
+  # _WORKER                        hostgroup_ntsgraz
+  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s nag+$USER11$+60+100-pnp+$USER9$+15+50-proxy+$USER10$+8000+12000-gm_total+$USER5$:$USER6$+10000+20000'
 }
 
 #define service {
@@ -189,7 +189,7 @@ define service {
 #  use                            mm-service
 #  process_perf_data              1
 #  _WORKER                        hostgroup_ntsgraz
-#  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s nag+194.50.28.42+100+200-pnp+194.50.28.43+80+150-proxy+194.50.28.81+5000+10000-gm_total+194.50.28.80:4730+10000+20000 -m TIME_WAIT'
+#  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s nag+$USER11$+100+200-pnp+$USER9$+80+150-proxy+$USER10$+5000+10000-gm_total+$USER5$:$USER6$+10000+20000 -m TIME_WAIT'
 #}
 
 
@@ -199,8 +199,8 @@ define host {
   host_name                      manmon_mmFrontend01
   alias                          FrontendServer
   use                            my_central
-  address                        194.50.28.40
-  _HOSTID                        2561
+  address                        {{ mm_frontend_ip }}
+  #_HOSTID                        2561
   #notes_url       /central/nts_maintain/show_notes.cgi?hostid=2561
 }
 
@@ -253,7 +253,7 @@ define service {
   normal_check_interval          1
   process_perf_data              1
   _WORKER
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q '(backup|monitor)_central'
+  check_command                  check_gearman_cluster!-H $USER5$ -p $USER6$ -q '(backup|monitor)_central'
 }
 
 define service {
@@ -262,7 +262,7 @@ define service {
   use                            mm-service
   process_perf_data              0
   action_url
-  _WORKER                       hostgroup_ntsgraz
+  # _WORKER                       hostgroup_ntsgraz
   check_command                  nc_nrpe!check_wf_state!-t 30  -a "-B YWRtaW46cmZjMTkxOAo="
 }
 
@@ -271,7 +271,7 @@ define service {
   host_name                      manmon_mmFrontend01
   use                            mm-service
   process_perf_data              1
-  _WORKER                       hostgroup_ntsgraz
+  # _WORKER                       hostgroup_ntsgraz
   check_command                  nc_nrpe!check_wf_memory!-t 30  -a "-B YWRtaW46cmZjMTkxOAo="
 }
 
@@ -280,7 +280,7 @@ define service {
   host_name                      manmon_mmFrontend01
   use                            mm-service
   process_perf_data              1
-  _WORKER                       hostgroup_ntsgraz
+  # _WORKER                       hostgroup_ntsgraz
   check_command                  nc_nrpe!check_wf_project!-t 30  -a "-B YWRtaW46cmZjMTkxOAo= -d monitor"
 }
 
@@ -289,7 +289,7 @@ define service {
   host_name                      manmon_mmFrontend01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
+  # _WORKER                        hostgroup_ntsgraz
   check_command                  nc_nrpe!check_wf_ldap_cache!-t 30  -a "-B YWRtaW46cmZjMTkxOAo="
 }
 
@@ -298,8 +298,8 @@ define service {
   host_name                      manmon_mmFrontend01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
-  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s wf+194.50.28.40:28080+100+200-db+194.50.28.41:3306+80+150-gm+194.50.28.80:4730+5+10-re+194.50.28.44:8080+50+150-ap+172.21.40.84:1433+10+15'
+  # _WORKER                        hostgroup_ntsgraz
+  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s wf+$USER7$:28080+100+200-db+$USER8$:3306+80+150-gm+$USER5$:$USER6$+5+10-re+$USER14$:8080+50+150-ap+172.21.40.84:1433+10+15'
 }
 
 define service {
@@ -307,8 +307,8 @@ define service {
   host_name                      manmon_mmFrontend01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
-  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s wf+194.50.28.40:28080+350+500-db+194.50.28.41:3306+5+10-gm+194.50.28.80:4730+100+150-re+194.50.28.44:8080+250+500-ap+172.21.40.84:1433+1+5 -m TIME_WAIT'
+  # _WORKER                        hostgroup_ntsgraz
+  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s wf+$USER7$:28080+350+500-db+$USER8$:3306+5+10-gm+$USR5$:$USER6$+100+150-re+$USER14$:8080+250+500-ap+172.21.40.84:1433+1+5 -m TIME_WAIT'
 }
 
 define service{
@@ -321,33 +321,25 @@ define service{
 }
 
 
-#define service {
-#  service_description            gearman_backup_central
-#  host_name                      manmon_mmFrontend01
-#  use                            mm-service
-#  process_perf_data              1
-#  _WORKER
-#  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q backup_central
-#}
 ######################################################################
 
-define service {
-  service_description            gearman
-  host_name                      manmon_mmMicroServices
-  use                            mm-service
-  normal_check_interval          1
-  process_perf_data              1
-  _WORKER
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q 'uom_central'
-}
+#define service {
+#  service_description            gearman
+#  host_name                      manmon_mmMicroServices
+#  use                            mm-service
+#  normal_check_interval          1
+#  process_perf_data              1
+#  _WORKER
+#  check_command                  check_gearman_cluster!-H $USER5$ -p $USER6$ -q 'uom_central'
+#}
 ######################################################################
 
 define host {
   host_name                      manmon_mmNagios01
   alias                          NagiosServer
   use                            my_central
-  address                        194.50.28.42
-  _HOSTID                        2562
+  address                        {{ mm_livestatus_server }}
+  #_HOSTID                        2562
 }
 
 define service {
@@ -385,7 +377,25 @@ define service {
   normal_check_interval          1
   process_perf_data              1
   _WORKER
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q 'check_results' -w 300 -c 500
+  check_command                  check_gearman_cluster!-H $USER5$ -p $USER6$ -q 'check_results|log_queue' -w 300 -c 500
+}
+
+#define service {
+#  service_description            splunk
+#  host_name                      manmon_mmNagios01
+#  # _WORKER                        hostgroup_ntsgraz
+#  use                            mm-service
+#  process_perf_data              1
+#  check_command                  nc_nrpe!check_procs!-t 30 -a '-C splunkd -c2:2'
+#}
+
+define service {
+  service_description            elastic_filebeat
+  host_name                      manmon_mmNagios01
+  # _WORKER                        hostgroup_ntsgraz
+  use                            mm-service
+  process_perf_data              1
+  check_command                  nc_nrpe!check_procs!-t 30 -a '-C filebeat -c2:2'
 }
 
 define service {
@@ -456,8 +466,8 @@ define host {
   alias                          PnpServer
   #_WORKER                        hostgroup_mmpnp01
   use                            my_central
-  address                        194.50.28.43
-  _HOSTID                        2563
+  address                        {{ mm_pnp_server }}
+  #_HOSTID                        2563
 }
 
 define service {
@@ -466,7 +476,7 @@ define service {
   use                            mm-service
   normal_check_interval          1
   process_perf_data              1
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q perfdata -w 1500 -c 5000
+  check_command                  check_gearman_cluster!-H $USER5$ -p $USER6$ -q perfdata -w 1500 -c 5000
 }
 
 define service {
@@ -475,7 +485,7 @@ define service {
   use                            mm-service
   normal_check_interval          1
   process_perf_data              1
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q hostgroup_mmpnp01 -w 2 -c 5
+  check_command                  check_gearman_cluster!-H $USER5$ -p $USER6$ -q hostgroup_mmpnp01 -w 2 -c 5
 }
 
 define service {
@@ -490,38 +500,18 @@ define service {
 ######################################################################
 
 define host {
-  host_name                      manmon_mmProv01
+  host_name                      manmon_mmSshP01
   alias                          Provisioning Server und SplunkForwarder
   use                            my_central
-  address                        194.50.28.82
-  _HOSTID                        2564
+  address                        $USER13$
+  #_HOSTID                        2564
   #notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
-}
-
-define service {
-  service_description            gearman
-  host_name                      manmon_mmProv01
-  use                            mm-service
-  normal_check_interval          1
-  process_perf_data              1
-  _WORKER
-  check_command                  check_gearman_cluster!-H 194.50.28.80 -p 4730 -q 'log_queue|mmprov01'
-  notes_url                      /central/nts_maintain/show_notes.cgi?hostid=$_HOSTHOSTID$
-}
-
-define service {
-  service_description            splunk
-  host_name                      manmon_mmProv01
-  _WORKER                        hostgroup_ntsgraz
-  use                            mm-service
-  process_perf_data              1
-  check_command                  nc_nrpe!check_procs!-t 30 -a '-C splunkd -c2:2'
 }
 
 
 # define service {
 #   service_description            test
-#   host_name                      manmon_mmProv01
+#   host_name                      manmon_mmSshP01
 #   _WORKER                        hostgroup_mmprov01
 #   use                            mm-service
 #   process_perf_data              1
@@ -535,8 +525,8 @@ define host {
   host_name                      manmon_mmProxy01
   alias                          Proxy Server S-Tunnel
   use                            my_central
-  address                        194.50.28.81
-  _HOSTID                        2565
+  address                        {{ mm_stunnel_ip }}
+  #_HOSTID                        2565
 }
 
 define service {
@@ -553,8 +543,8 @@ define service {
   host_name                      manmon_mmProxy01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
-  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s gm+194.50.28.80:4730+7500+9000-stun+194.50.28.81:443+7500+9000-ssh+194.50.28.82:22+150+250-squid+127.0.0.1:3128+150+250'
+  # _WORKER                        hostgroup_ntsgraz
+  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s gm+$USER5$:$USER6$+7500+9000-stun+$USER10$:443+7500+9000-ssh+$USER13$:22+150+250-squid+$USER12$:3128+150+250'
 }
 
 define service {
@@ -562,37 +552,19 @@ define service {
   host_name                      manmon_mmProxy01
   use                            mm-service
   process_perf_data              1
-  _WORKER                        hostgroup_ntsgraz
-  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s gm+194.50.28.80:4730+4500+6000-stun+194.50.28.81:443+4500+5000-ssh+194.50.28.82:22+70+150-squid+127.0.0.1:3128+70+150 -m TIME_WAIT'
-}
-
-######################################################################
-define host {
-  host_name                      manmon_mmCert01
-  alias                          CertServer
-  use                            my_central
-  address                        194.50.28.86
-  _HOSTID                        9258
+  # _WORKER                        hostgroup_ntsgraz
+  check_command                  nc_nrpe!check_netstat_sessions!-t 30  -a '-s gm+$USER5$:$USER6$+4500+6000-stun+$USER10$:443+4500+5000-ssh+$USER13$:22+70+150-squid+$USER12$:3128+70+150 -m TIME_WAIT'
 }
 
 
 
 ######################################################################
 
-#define host {
-#  host_name                      backup_check_no_mon
-#  alias                          Ergebnisse des BackupCheck fuer Kunden ohne Monitoring
-#  use                            my_central
-#  address                        127.0.0.1
-#}
-
-
-######################################################################
 ######################################################################
 
 define service {
   service_description            http_cert
-  host_name                      manmon_mmNagios01,manmon_mmPNP01,manmon_mmProv01,manmon_mmCert01
+  host_name                      manmon_mmNagios01,manmon_mmPNP01,manmon_mmSshP01
   use                            mm-service
   process_perf_data              0
   action_url
@@ -601,21 +573,13 @@ define service {
 
 ######################################################################
 
-define host {
-  host_name                      manmon_mmDevNagios
-  alias                          NagiosServer Dev
-  use                            my_central
-  address                        172.21.200.11
-  _HOSTID                        11521
-}
-
 
 ######################################################################
 ## central via nrpe ## ###############################################
 define service {
   service_description            disk
-  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmProv01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
-  _WORKER                       hostgroup_ntsgraz
+  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
+  # _WORKER                       hostgroup_ntsgraz
   use                            mm-service
   process_perf_data              1
   check_command                  nc_nrpe!check_disk!-t 30 -a '-w 10% -c 5% -r /dev/ -r tmpfs -e '
@@ -623,8 +587,8 @@ define service {
 
 define service {
   service_description            load
-  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmProv01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
-  _WORKER                       hostgroup_ntsgraz
+  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
+  # _WORKER                       hostgroup_ntsgraz
   use                            mm-service
   process_perf_data              1
   check_command                  nc_nrpe!check_load!-t 30 -a '-w 8,6,4 -c 12,10,8'
@@ -632,7 +596,7 @@ define service {
 
 #define service {
 #  service_description            swap
-#  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmProv01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
+#  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
 #  _WORKER                       hostgroup_ntsgraz
 #  use                            mm-service
 #  process_perf_data              1
@@ -641,8 +605,8 @@ define service {
 
 define service {
   service_description            vmstat
-  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmProv01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
-  _WORKER                       hostgroup_ntsgraz
+  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
+  # _WORKER                       hostgroup_ntsgraz
   use                            mm-service
   process_perf_data              1
   check_command                  nc_nrpe!check_vmstat!-t 60 -a "-t 50"
@@ -650,8 +614,8 @@ define service {
 
 define service {
   service_description            intf_bandwidth
-  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmProv01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
-  _WORKER                       hostgroup_ntsgraz
+  host_name                      manmon_mmDb01,manmon_mmFrontend01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmProxy01,manmon_mmPNP01
+  # _WORKER                       hostgroup_ntsgraz
   use                            mm-service
   process_perf_data              1   
   #check_command                  nc_nrpe!check_if!-t30 -a '-H _local_if_ -n eth0 --mode_bandwidth --val_warnOctetsBaseline 100:100  --min_exitcode 0 --reference  "LSO=$LONGSERVICEOUTPUT$" '
@@ -663,11 +627,11 @@ define service {
 ##
 define service {
   service_description            omd_status
-  host_name                      manmon_mmNagios01,manmon_mmProv01,manmon_mmQueue01,manmon_mmDevNagios,manmon_mmPNP01
+  host_name                      manmon_mmNagios01,manmon_mmSshP01,manmon_mmQueue01,manmon_mmPNP01
   use                            mm-service
   process_perf_data              0
   action_url
-  _WORKER                       hostgroup_ntsgraz
+  # _WORKER                       hostgroup_ntsgraz
   check_command                  nc_nrpe!check_omd!
 }
 

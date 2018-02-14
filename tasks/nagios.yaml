@@ -1,4 +1,6 @@
 ---
+# OMD NAGIOS 
+
 
 - name: enable process perfdata
   lineinfile: 
@@ -24,63 +26,5 @@
     state: link
   become: true
 
-- name: copy neamon config
-  copy: 
-    src: "files/naemon_conf/"
-    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/conf.d"
-    mode: 0755
-    directory_mode: 0755
-    owner: central
-    group: central
-  notify: restart omd
-  become: true
-  tags: didi
-  
-- name: create file /omd/sites/central/etc/naemon/conf.d/maintain.log
-  file:
-    path: /omd/sites/central/etc/naemon/conf.d/maintain.log
-    state: touch
-    mode: 0666
-    #owner: central
-  become: true
-  tags: didi
 
-- name: install resource.cfg 
-  template: 
-    src: resource_cfg.j2
-    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/resource.cfg"
-    owner: central
-    group: central
-    mode: 0644
-  notify: restart omd
-  become: true
-  
-
-- name: install mm-plot-template mm_monitoring_central
-  template: 
-    src: "{{ item.src }}"
-    dest: "/opt/omd/sites/{{ omd_site }}/etc/naemon/conf.d/{{ item.dest }}"
-    owner: central
-    group: central
-    mode: 0644
-  with_items: 
-    - { src: "mm_plot_template.j2", dest: "mm_plot_template.cfg" }
-    - { src: "mm_monitoring_central_cfg.j2", dest: "mm_monitoring_central.cf.cfg" }
-  notify: restart omd
-  become: true
-  tags: didi
-  
-- name: copy apache config
-  copy: 
-    src: "files/apache_conf/nts_maintain.conf"
-    dest: "/opt/omd/sites/{{ omd_site }}/etc/apache/conf.d"
-    mode: 0755
-    directory_mode: 0755
-    owner: central
-    group: central
-  become: true
-  notify: restart omd
-  tags: didi
-
-  
   

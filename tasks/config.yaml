@@ -40,8 +40,11 @@
     - {key: CORE, value: '{{ omd_config_core }}' }
     - {key: DEFAULT_GUI, value: '{{ omd_config_default_gui }}' }
     - {key: LIVESTATUS_TCP, value: 'on' }
+    - {key: MOD_GEARMAN, value: 'on'}
+    - {key: GEARMAND, value: 'off' }
     - {key: GEARMAND_PORT, value: '{{ omd_gearmand_ip }}:{{ omd_config_gearmand_port }}' }
     - {key: GEARMAN_WORKER, value: 'on' } 
+    - {key: PNP4NAGIOS, value: 'off'}
   notify: start omd site
   become: true
   when: omd_feature_nagios
@@ -56,7 +59,11 @@
     - {key: APACHE_MODE, value: 'own' }
     - {key: PNP4NAGIOS, value: 'gearman'}
     - {key: GEARMAN_WORKER, value: 'on' }
+    - {key: MOD_GEARMAN, value: 'on'}
+    - {key: GEARMAND_PORT, value: '{{ omd_gearmand_ip }}:{{ omd_config_gearmand_port }}' }
     - {key: DEFAULT_GUI, value: 'pnp4nagios' }
+    - {key: CORE, value: 'none'}
+    - {key: GEARMAND, value: 'off' }
   notify: start omd site
   become: true
   when: omd_feature_pnp4nagios
@@ -72,3 +79,4 @@
   notify: start omd site
   become: true
   when: omd_feature_worker
+

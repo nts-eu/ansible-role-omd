@@ -36,6 +36,7 @@
     value: '{{ item.value }}'
   with_items: 
     - {key: APACHE_TCP_ADDR, value: '0.0.0.0' }
+    - {key: APACHE_TCP_PORT, value: '5000' }
     - {key: APACHE_MODE, value: 'own' }
     - {key: CORE, value: '{{ omd_config_core }}' }
     - {key: DEFAULT_GUI, value: '{{ omd_config_default_gui }}' }
@@ -45,6 +46,7 @@
     - {key: GEARMAND_PORT, value: '{{ omd_gearmand_ip }}:{{ omd_config_gearmand_port }}' }
     - {key: GEARMAN_WORKER, value: 'on' } 
     - {key: PNP4NAGIOS, value: 'off'}
+    - {key: THRUK_COOKIE_AUTH, value: 'off'}
   notify: start omd site
   become: true
   when: omd_feature_nagios
@@ -56,6 +58,7 @@
     value: '{{ item.value }}'
   with_items: 
     - {key: APACHE_TCP_ADDR, value: '0.0.0.0' }
+    - {key: APACHE_TCP_PORT, value: '5000' }
     - {key: APACHE_MODE, value: 'own' }
     - {key: PNP4NAGIOS, value: 'gearman'}
     - {key: GEARMAN_WORKER, value: 'on' }
@@ -64,6 +67,7 @@
     - {key: DEFAULT_GUI, value: 'pnp4nagios' }
     - {key: CORE, value: 'none'}
     - {key: GEARMAND, value: 'off' }
+    - {key: THRUK_COOKIE_AUTH, value: 'off'}
   notify: start omd site
   become: true
   when: omd_feature_pnp4nagios

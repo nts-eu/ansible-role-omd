@@ -80,6 +80,10 @@
   with_items: 
     - {key: MOD_GEARMAN, value: 'on'}
     - {key: GEARMAN_WORKER, value: 'on'}
+    - {key: CORE, value: 'none'}
+    - {key: PNP4NAGIOS, value: 'off'}
+    - {key: GEARMAND, value: 'off' }
+    - {key: APACHE_MODE, value: 'none' }
   notify: start omd site
   become: true
   when: omd_feature_worker

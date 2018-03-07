@@ -1,6 +1,7 @@
 
 - name: shared mod gearman key
   template: 
+    follow: yes
     src: secret.key.j2
     dest: /omd/sites/{{ omd_site }}/etc/mod-gearman/secret.key
     owner: '{{ omd_site }}'

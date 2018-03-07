@@ -35,6 +35,7 @@
 
 - name: symlink /etc/init.d/omd
   file: 
+    follow: yes
     src: "/etc/init.d/omd-{{ omd_version }}"
     dest: /etc/init.d/omd
     owner: root

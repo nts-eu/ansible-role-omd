@@ -21,6 +21,7 @@
 
 - name: symlink omd site central to worker
   file:
+    follow: yes
     src: /opt/omd/sites/central
     dest: /opt/omd/sites/worker
     state: link

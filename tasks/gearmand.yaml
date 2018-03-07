@@ -2,6 +2,7 @@
 
 - name: increase open file /etc/security/limits.conf
   template: 
+    follow: yes
     src: limits.conf.j2
     dest: /etc/security/limits.conf
     owner: root
